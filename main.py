@@ -7,7 +7,6 @@ from datetime import date, datetime
 st.set_page_config(
     page_title="Streamlit To-Do Application",
     page_icon="📋",
-    layout="wide"
 )
 
 # File to store tasks
@@ -31,45 +30,18 @@ def save_tasks(tasks):
 
 # Streamlit App
 def main():
-
     st.title("📋 Streamlit To-Do Application")
-    col3, col4 = st.columns(2, vertical_alignment='top')
-    with col3:
-        with st.container(border=True):
-            # View Tasks
-            st.subheader("Your To-Do List")
-            tasks = load_tasks()
-            if not tasks:
-                st.info("No tasks found!")
-            else:
-                for idx, task in enumerate(tasks, start=1):
-                    # Display checkbox and task text on the same line using a column layout
-                    cols = st.columns([0.04, 0.96], vertical_alignment='top')  # Adjust column widths as needed
-                    with cols[0]:
-                        completed = st.checkbox("", key=f"view_{idx}")  # Key prevents duplicate issues
-                    with cols[1]:
-                        task_text = f"*{idx}.*  *{task['title']}* : {task['description']} | :orange[*{task['deadline']}*]  \n:blue-background[{task['category'].upper()}] :green-background[{task['priority'].upper()}]"
 
-                        try:
-                            if date.today() > datetime.strptime(task['deadline'], '%Y-%m-%d').date():
-                                task_text = f":red[{task_text} : Deadline is Over!]"
-                        except ValueError:
-                                task_text = f"~:orange[Invalid Deadline Format: {task_text}]~"
-
-                        if completed:
-                            task_text = f"~:gray[{task_text}]~"
-                        st.markdown(task_text, unsafe_allow_html=True)
-    with col4:
-        # Navigation
+    @st.dialog("Task Dialog")
+    def task():
         option = st.selectbox("Choose an option", ("Add Task", "Update Task", "Delete Task"), index=None)
-
         # Add Task
         if option == "Add Task":
             with st.container(border=True):
                 st.subheader("Add a New Task")
                 title = st.text_input("Task Title")
                 description = st.text_area("Task Description")
-                col6, col7, col8 = st.columns(3, vertical_alignment="center")
+                col6, col7, col8 = st.columns(3, vertical_alignment="bottom")
                 with col6:
                     category = st.text_input("Task Category (e.g., Work, Study)")
                 with col7:
@@ -91,7 +63,7 @@ def main():
                         tasks.append(new_task)
                         save_tasks(tasks)
                         st.success("Task added successfully!")
-                        st_autorefresh(interval=1000, limit=2)
+                        st.rerun()
 
         # Update Task
         elif option == "Update Task":
@@ -132,7 +104,7 @@ def main():
                         }
                         save_tasks(tasks)
                         st.success("Task updated successfully!")
-                        st.autorefresh(interval=1000, limit=2)  # Automatically refresh the app
+                        st.rerun()
 
         # Delete Task
         elif option == "Delete Task":
@@ -150,7 +122,38 @@ def main():
                         deleted_task = tasks.pop(task_index)
                         save_tasks(tasks)
                         st.success(f"Task '{deleted_task['title']}' deleted successfully!")
-                        st_autorefresh(interval=1000, limit=2)
+                        st.rerun()
+
+    with st.container(border=True):
+        col98, col99 = st.columns([0.32, 0.68], vertical_alignment='top')
+        # View Tasks
+        with col98:
+            st.subheader("Your To-Do List")
+        with col99:
+            if st.button(":material/open_in_new: Open Task Dialog", use_container_width=True):
+                task()
+
+        tasks = load_tasks()
+        if not tasks:
+            st.info("Add tasks to view them here!")
+        else:
+            for idx, task in enumerate(tasks, start=1):
+                # Display checkbox and task text on the same line using a column layout
+                cols = st.columns([0.04, 0.96], vertical_alignment='top')  # Adjust column widths as needed
+                with cols[0]:
+                    completed = st.checkbox("", key=f"view_{idx}")  # Key prevents duplicate issues
+                with cols[1]:
+                    task_text = f"*{idx}.*  *{task['title']}* : {task['description']} | :orange[*{task['deadline']}*]  \n:blue-background[{task['category'].upper()}] :green-background[{task['priority'].upper()}]"
+
+                    try:
+                        if date.today() > datetime.strptime(task['deadline'], '%Y-%m-%d').date():
+                            task_text = f":red[{task_text} : Deadline is Over!]"
+                    except ValueError:
+                            task_text = f"~:orange[Invalid Deadline Format: {task_text}]~"
+
+                    if completed:
+                        task_text = f"~:gray[{task_text}]~"
+                    st.markdown(task_text, unsafe_allow_html=True)
 
 # Run the Streamlit app
 if _name_ == "_main_":
