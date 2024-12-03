@@ -110,7 +110,7 @@ with st.container(border=True):
             completed = st.checkbox("", key=f"view_{task[0]}")
 
         with col1:
-            task_text = f"**{task[0]}.** **{task[1]}** - :blue-background[{task[4]}] ***:orange[(Due: {task[5]})]***  \n :green-background[Category: {task[3]}] | Description: {task[2]}"
+            task_text = f"**{task[1]}** - :blue-background[{task[4]}] ***:orange[(Due: {task[5]})]***  \n :green-background[Category: {task[3]}] | Description: {task[2]}"
             if completed:
                 task_text = f"~~:gray[{task_text}]~~"
             st.markdown(task_text, unsafe_allow_html=True)

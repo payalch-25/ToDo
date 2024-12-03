@@ -1,7 +1,6 @@
 import streamlit as st
 import json
 import os
-from streamlit_autorefresh import st_autorefresh
 from datetime import date, datetime
 
 st.set_page_config(
@@ -156,6 +155,6 @@ def main():
                     st.markdown(task_text, unsafe_allow_html=True)
 
 # Run the Streamlit app
-if _name_ == "_main_":
+if __name__ == "__main__":
     initialize_file()
     main()
